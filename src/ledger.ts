@@ -37,3 +37,20 @@ export function transfer(
 export function history(records: TransferRecord[], accountId: string): TransferRecord[] {
   return records.filter((r) => r.from === accountId || r.to === accountId);
 }
+
+/// What this account held at `at`, replayed from its opening balance.
+/// The log is append-only and already chronological, so one pass is enough.
+export function balanceAt(
+  records: TransferRecord[],
+  accountId: string,
+  openingBalance: number,
+  at: number,
+): number {
+  return records
+    .filter((r) => r.timestamp <= at)
+    .reduce((balance, r) => {
+      if (r.from === accountId) return balance - r.amount;
+      if (r.to === accountId) return balance + r.amount;
+      return balance;
+    }, openingBalance);
+}
