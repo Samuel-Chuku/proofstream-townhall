@@ -1,0 +1,39 @@
+export type Account = { id: string; balance: number };
+
+export type TransferRecord = {
+  from: string;
+  to: string;
+  amount: number;
+  timestamp: number;
+};
+
+export function balanceOf(account: Account): number {
+  return account.balance;
+}
+
+export function transfer(
+  from: Account,
+  to: Account,
+  amount: number,
+  log: TransferRecord[] = [],
+): [Account, Account, TransferRecord[]] {
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error(`transfer amount must be positive, got ${amount}`);
+  }
+  if (from.balance < amount) {
+    throw new Error(`overdraft blocked: ${from.id} holds ${from.balance}, ${amount} requested`);
+  }
+
+  const record: TransferRecord = { from: from.id, to: to.id, amount, timestamp: Date.now() };
+
+  return [
+    { ...from, balance: from.balance - amount },
+    { ...to, balance: to.balance + amount },
+    [...log, record],
+  ];
+}
+
+/// Every record involving this account, in the order it happened.
+export function history(records: TransferRecord[], accountId: string): TransferRecord[] {
+  return records.filter((r) => r.from === accountId || r.to === accountId);
+}

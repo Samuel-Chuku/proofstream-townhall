@@ -1,0 +1,11 @@
+{
+  "name": "proofstream-townhall",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "tsx --test src/*.test.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}
