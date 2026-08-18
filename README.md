@@ -1,4 +1,4 @@
-# ProofStream — live demo
+# ProofStream: live demo
 
 A tiny ledger module. A ProofStream milestone is open against this repository,
 and an autonomous agent judges every merge into `main` against it.
@@ -19,9 +19,6 @@ Two things are asked for: the function, and the tests.
 | #1 | `balanceAt`, and no tests | partially done — the function is there, the tests are not |
 | #2 | the tests | done |
 
-Nobody tells the agent the answer. It reads the milestone from the contract,
-fetches the diff itself, buys a second opinion from another agent over x402,
-and signs the attestation.
 
 ```bash
 npm install && npm test
