@@ -18,8 +18,3 @@ Two things are asked for: the function, and the tests.
 | --- | --- | --- |
 | #1 | `balanceAt`, and no tests | partially done — the function is there, the tests are not |
 | #2 | the tests | done |
-
-
-```bash
-npm install && npm test
-```
