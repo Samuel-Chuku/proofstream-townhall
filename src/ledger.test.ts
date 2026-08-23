@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { balanceAt, balanceOf, history, transfer, type Account, type TransferRecord } from './ledger';
+import { balanceAt, balanceOf, history, statement, transfer, type Account, type StatementLine, type TransferRecord } from './ledger';
 
 const alice = (): Account => ({ id: 'alice', balance: 100 });
 const bob = (): Account => ({ id: 'bob', balance: 50 });
@@ -41,4 +41,32 @@ test('balanceAt before any activity is the opening balance', () => {
 
 test('balanceAt ignores accounts it was not asked about', () => {
   assert.equal(balanceAt(log, 'dave', 40, 999), 40);
+});
+
+test('statement returns one line per record involving the account', () => {
+  const lines = statement(log, 'alice', 100);
+  assert.equal(lines.length, 3);
+  assert.deepEqual(lines.map((l) => l.balance), [70, 80, 75]);
+});
+
+test('statement is chronological and carries the record itself', () => {
+  const lines = statement(log, 'alice', 100);
+  assert.deepEqual(lines.map((l) => l.record.timestamp), [100, 200, 300]);
+  assert.equal(lines[1].record.from, 'carol');
+});
+
+test('an account with no records has an empty statement', () => {
+  assert.deepEqual(statement(log, 'dave', 40), []);
+});
+
+test('a transfer to self nets to zero but still appears', () => {
+  const selfPay: TransferRecord[] = [{ from: 'alice', to: 'alice', amount: 25, timestamp: 400 }];
+  const lines = statement(selfPay, 'alice', 100);
+  assert.equal(lines.length, 1);
+  assert.equal(lines[0].balance, 100);
+});
+
+test('the final statement balance agrees with balanceAt', () => {
+  const lines = statement(log, 'alice', 100);
+  assert.equal(lines[lines.length - 1].balance, balanceAt(log, 'alice', 100, 999));
 });
