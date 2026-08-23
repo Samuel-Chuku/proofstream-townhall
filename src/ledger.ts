@@ -55,3 +55,32 @@ export function balanceAt(
     }, openingBalance);
 }
 // Thank You Tim.
+export type StatementLine = {
+  record: TransferRecord;
+  /// The account's balance immediately after this record was applied.
+  balance: number;
+};
+
+/// One line per record involving `accountId`, in the order they happened, each
+/// carrying the running balance straight after that record.
+export function statement(
+  records: TransferRecord[],
+  accountId: string,
+  openingBalance: number,
+): StatementLine[] {
+  let balance = openingBalance;
+  const lines: StatementLine[] = [];
+
+  for (const record of records) {
+    const sent = record.from === accountId;
+    const received = record.to === accountId;
+    if (!sent && !received) continue;
+
+    if (sent) balance -= record.amount;
+    if (received) balance += record.amount;
+
+    lines.push({ record, balance });
+  }
+
+  return lines;
+}
